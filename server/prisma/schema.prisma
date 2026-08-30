@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  SUPERVISOR
+  STAFF
+  ADMIN
+}
+
+enum BlockType {
+  BOYS
+  GIRLS
+  MIXED
+}
+
+enum RequestStatus {
+  PENDING
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  CLOSED
+}
+
+enum ResolutionType {
+  COMPLETED
+  FAILED
+}
+
+model Block {
+  id           String    @id @default(uuid())
+  name         String    @unique
+  type         BlockType
+  supervisorId String?   @map("supervisor_id")
+  supervisor   User?     @relation("BlockSupervisor", fields: [supervisorId], references: [id])
+  users        User[]    @relation("BlockUsers")
+  requests     CleaningRequest[]
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  @@map("blocks")
+}
+
+model User {
+  id             String   @id @default(uuid())
+  role           Role
+  name           String
+  regNo          String?  @unique @map("reg_no")
+  email          String?  @unique
+  passwordHash   String   @map("password_hash")
+  blockId        String?  @map("block_id")
+  block          Block?   @relation("BlockUsers", fields: [blockId], references: [id])
+  roomNo         String?  @map("room_no")
+  phone          String?
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  supervisedBlocks Block[]            @relation("BlockSupervisor")
+  raisedRequests   CleaningRequest[]  @relation("StudentRequests")
+  assignedRequests CleaningRequest[]  @relation("StaffAssignments")
+  notifications    Notification[]
+
+  @@map("users")
+}
+
+model CleaningRequest {
+  id                  String          @id @default(uuid())
+  studentId           String          @map("student_id")
+  student             User            @relation("StudentRequests", fields: [studentId], references: [id])
+  blockId             String          @map("block_id")
+  block               Block           @relation(fields: [blockId], references: [id])
+  roomNo              String          @map("room_no")
+  cleaningType        String          @map("cleaning_type")
+  comment             String?
+  status              RequestStatus   @default(PENDING)
+  assignedStaffId     String?         @map("assigned_staff_id")
+  assignedStaff       User?           @relation("StaffAssignments", fields: [assignedStaffId], references: [id])
+  assignedAt          DateTime?       @map("assigned_at")
+  resolutionType      ResolutionType? @map("resolution_type")
+  resolutionNote      String?         @map("resolution_note")
+  resolutionPhotoUrl  String?         @map("resolution_photo_url")
+  resolvedAt          DateTime?       @map("resolved_at")
+  studentConfirmedAt  DateTime?       @map("student_confirmed_at")
+  parentRequestId     String?         @map("parent_request_id")
+  parentRequest       CleaningRequest?  @relation("ReRaisedFrom", fields: [parentRequestId], references: [id])
+  reRaisedRequests    CleaningRequest[] @relation("ReRaisedFrom")
+  createdAt           DateTime        @default(now()) @map("created_at")
+  updatedAt           DateTime        @updatedAt @map("updated_at")
+  notifications       Notification[]
+
+  @@map("cleaning_requests")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id])
+  requestId String   @map("request_id")
+  request   CleaningRequest @relation(fields: [requestId], references: [id])
+  message   String
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("notifications")
+}

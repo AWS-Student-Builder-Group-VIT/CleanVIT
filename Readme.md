@@ -16,8 +16,8 @@ Currently, hostel/PG room cleaning requests are handled informally over WhatsApp
 
 **Goal:** Build a lightweight web app (Vite + React) with role-based access where:
 1. **Students** sign up with Reg No., raise cleaning alerts for their room, add optional comments (type of cleaning), and mark requests as "Done" once satisfied.
-2. **Block Supervisors** see all cleaning alerts for their block, assign them to cleaning staff.
-3. **Cleaning Staff** (either app users or supervisor-managed) mark requests complete, or mark them "Failed" with a reason + photo proof (e.g. room locked).
+2. **Block Wardens (Supervisors)** see all cleaning alerts ONLY for their assigned block, assign them to cleaning staff.
+3. **Cleaning Staff** (either app users or warden-managed) mark requests complete, or mark them "Failed" with a reason + photo proof (e.g. room locked).
 4. **Students** get notified of the final outcome — "Cleaning Done" or "Cleaning Failed" (with reason/photo) and can re-raise if needed.
 
 ---
@@ -26,10 +26,10 @@ Currently, hostel/PG room cleaning requests are handled informally over WhatsApp
 
 | Role | Access |
 |---|---|
-| **Student** | Sign up/login with Reg No. + password. Raise/view/close own requests. |
-| **Block Supervisor** | Login. View all requests for their assigned block. Assign staff, monitor status. |
-| **Cleaning Staff** | Login (or supervisor-managed accounts). View assigned tasks. Mark done/failed with photo + reason. |
-| **Admin** *(optional, phase 2)* | Manage blocks, supervisors, staff accounts, view analytics across all blocks. |
+| **Student** | Sign up/login with Reg No. + password. Raise/view/close own requests. Can only raise requests for their own block. |
+| **Block Warden (Supervisor)** | Login. View all requests ONLY for their assigned block. Assign staff, monitor status. |
+| **Cleaning Staff** | Login (or warden-managed accounts). View assigned tasks. Mark done/failed with photo + reason. |
+| **Admin** *(optional, phase 2)* | Manage blocks, wardens, staff accounts, view analytics across all blocks. |
 
 ---
 
