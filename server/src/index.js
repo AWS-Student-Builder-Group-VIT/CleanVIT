@@ -33,6 +33,11 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 CleanTrack API running on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`🚀 CleanTrack API running on http://localhost:${PORT}`);
+  });
+}
+
+// Export for serverless environments (Vercel)
+module.exports = app;
