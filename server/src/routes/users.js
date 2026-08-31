@@ -35,4 +35,24 @@ router.get('/staff', authorize('SUPERVISOR'), async (req, res) => {
   }
 });
 
+/**
+ * PUT /api/users/push-token
+ * Update push token for notifications
+ */
+router.put('/push-token', async (req, res) => {
+  try {
+    const { token } = req.body;
+    
+    await prisma.user.update({
+      where: { id: req.user.id },
+      data: { expoPushToken: token }
+    });
+
+    res.json({ message: 'Push token updated' });
+  } catch (err) {
+    console.error('Update push token error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 module.exports = router;
