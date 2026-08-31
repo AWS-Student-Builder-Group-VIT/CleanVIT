@@ -1,10 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
-  Modal, TextInput, ActivityIndicator, Alert, RefreshControl, Image,
+  Modal, ActivityIndicator, Alert, RefreshControl, Image,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '../context/AuthContext';
 import { requestsAPI } from '../services/api';
 import StatusBadge from '../components/StatusBadge';
@@ -85,39 +84,11 @@ export default function StaffDashboardScreen() {
   };
 
   const pickPhoto = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission needed', 'Camera permission is required to take photos');
-      return;
-    }
-
-    const result = await ImagePicker.launchCameraAsync({
-      quality: 0.5,
-      base64: true,
-      allowsEditing: true,
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      setFailPhoto(`data:image/jpeg;base64,${result.assets[0].base64}`);
-    }
+    Alert.alert('Coming Soon', 'Photo upload will be enabled in the next update.');
   };
 
   const pickFromGallery = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission needed', 'Gallery permission is required');
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      quality: 0.5,
-      base64: true,
-      allowsEditing: true,
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      setFailPhoto(`data:image/jpeg;base64,${result.assets[0].base64}`);
-    }
+    Alert.alert('Coming Soon', 'Gallery upload will be enabled in the next update.');
   };
 
   const handleFail = async () => {

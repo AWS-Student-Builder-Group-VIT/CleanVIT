@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { StatusBar, ActivityIndicator, View, Platform } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import * as Notifications from 'expo-notifications';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { usersAPI } from './src/services/api';
 import { COLORS } from './src/theme';
@@ -14,15 +14,6 @@ import StudentDashboardScreen from './src/screens/StudentDashboardScreen';
 import RequestDetailScreen from './src/screens/RequestDetailScreen';
 import SupervisorDashboardScreen from './src/screens/SupervisorDashboardScreen';
 import StaffDashboardScreen from './src/screens/StaffDashboardScreen';
-
-// Configure notification handling
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
 
 const AuthStack = createNativeStackNavigator();
 const StudentStack = createNativeStackNavigator();
@@ -100,65 +91,7 @@ function AppContent() {
 
   // Register for push notifications when user logs in
   useEffect(() => {
-    if (!user) return;
-
-    const registerPushNotifications = async () => {
-      try {
-        const { status: existingStatus } = await Notifications.getPermissionsAsync();
-        let finalStatus = existingStatus;
-
-        if (existingStatus !== 'granted') {
-          const { status } = await Notifications.requestPermissionsAsync();
-          finalStatus = status;
-        }
-
-        if (finalStatus !== 'granted') {
-          console.log('Push notification permission not granted');
-          return;
-        }
-
-        // Set notification channel for Android
-        if (Platform.OS === 'android') {
-          await Notifications.setNotificationChannelAsync('default', {
-            name: 'CleanTrack',
-            importance: Notifications.AndroidImportance.MAX,
-            vibrationPattern: [0, 250, 250, 250],
-            lightColor: '#7c5cfc',
-          });
-        }
-
-        const tokenData = await Notifications.getExpoPushTokenAsync({
-          projectId: 'cleantrack-mobile',
-        });
-
-        // Send token to backend
-        await usersAPI.updatePushToken(tokenData.data);
-        console.log('Push token registered:', tokenData.data);
-      } catch (err) {
-        console.error('Push notification registration error:', err);
-      }
-    };
-
-    registerPushNotifications();
-
-    // Listen for incoming notifications
-    notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
-      console.log('Notification received:', notification);
-    });
-
-    // Listen for notification taps
-    responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
-      console.log('Notification tapped:', response);
-    });
-
-    return () => {
-      if (notificationListener.current) {
-        Notifications.removeNotificationSubscription(notificationListener.current);
-      }
-      if (responseListener.current) {
-        Notifications.removeNotificationSubscription(responseListener.current);
-      }
-    };
+    // Notifications disabled
   }, [user]);
 
   if (loading) {
@@ -188,22 +121,24 @@ function AppContent() {
 export default function App() {
   return (
     <AuthProvider>
-      <NavigationContainer
-        theme={{
-          dark: true,
-          colors: {
-            primary: COLORS.accentPrimary,
-            background: COLORS.bgPrimary,
-            card: COLORS.bgSecondary,
-            text: COLORS.textPrimary,
-            border: COLORS.borderLight,
-            notification: COLORS.accentPrimary,
-          },
-        }}
-      >
-        <StatusBar barStyle="light-content" backgroundColor={COLORS.bgPrimary} />
-        <AppContent />
-      </NavigationContainer>
+      <SafeAreaProvider>
+        <NavigationContainer
+          theme={{
+            dark: true,
+            colors: {
+              primary: COLORS.accentPrimary,
+              background: COLORS.bgPrimary,
+              card: COLORS.bgSecondary,
+              text: COLORS.textPrimary,
+              border: COLORS.borderLight,
+              notification: COLORS.accentPrimary,
+            },
+          }}
+        >
+          <StatusBar barStyle="light-content" backgroundColor={COLORS.bgPrimary} />
+          <AppContent />
+        </NavigationContainer>
+      </SafeAreaProvider>
     </AuthProvider>
   );
 }
